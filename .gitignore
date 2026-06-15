@@ -2,3 +2,8 @@ deepfake_env
 __pycache__
 .vscode
 node_modules
+.env
+dist/
+build/
+coverage/
+.DS_Store
