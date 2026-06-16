@@ -1,18 +1,19 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useEffect, useState } from 'react'
 
 export const UserDataContext=createContext();
 
 const UserContext = ({children}) => {
-  
-  // const [user, setUser] = useState({
-  //   _id: "",
-  //   fullname: "",
-  //   email: "",
-  //   apiKey: "",
-  //   apiUsageCount: 0,
-  //   apiLimit: 0
-  // })
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(()=>{
+    const savedUser = localStorage.getItem("saas_user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("saas_user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("saas_user");
+    }
+  }, [user]);
  
   return (
       <UserDataContext.Provider value={{ user, setUser }}>

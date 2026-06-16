@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-// import cookieParser from "cookieParser";
+import cookieParser from "cookie-parser";
 
 const app=express();
 
@@ -14,7 +14,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended:true }));
 app.use(express.static("public"));
-// app.use(cookieParser());
+app.use(cookieParser());
 
 import UserRouter from "./routes/user.routes.js";
 import AiServiceRouter from "./routes/aiService.routes.js"

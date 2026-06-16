@@ -22,7 +22,6 @@ const generateAccessAndRefreshToken = async (userId) => {
 
 const registerUser = asyncHandler(async (req,res)=>{
   try{
-    // console.log(1);
     const {fullname,email,password} = req.body;
     if([fullname, email, password].some((field)=> !field || field.trim() === "")){
       return res.status(400).json({message:"All fields are required"});
@@ -32,10 +31,12 @@ const registerUser = asyncHandler(async (req,res)=>{
     if(existedUser){
       return res.status(409).json({message:"User Already Existed"});
     }
+    const newApiKey = `df_live_${crypto.randomBytes(24).toString("hex")}`;
     const createUser =await User.create({
       fullname,
       email,
-      password
+      password,
+      apiKey: newApiKey
     })
     
     const createdUser=await User.findById(createUser._id).select("-password");
@@ -45,10 +46,12 @@ const registerUser = asyncHandler(async (req,res)=>{
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
       createdUser._id
     );
+    
+
     const options = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production" ? true : false,
-      sameSite: "None",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     };
     return res
     .status(201)
@@ -93,7 +96,7 @@ const loginUser = asyncHandler(async (req,res)=>{
     const options = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production" ? true : false,
-      sameSite: "None",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     };
     // console.log("10");
     return res
@@ -122,6 +125,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production" ? true : false,
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax"
   };
   return res
     .status(200)

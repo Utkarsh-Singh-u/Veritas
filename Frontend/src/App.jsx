@@ -2,6 +2,8 @@ import './App.css'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from './Pages/Login';
 import SignUp from './Pages/SignUp';
+import Dashboard from './Pages/Dashboard';
+import Home from './Pages/Home';
 
 
 function App() {
@@ -10,9 +12,10 @@ function App() {
     <>
     <div className="relative font-sans">
       <Routes>
-        <Route path="/" element={<h1 className="text-4xl text-center mt-20 font-bold text-blue-500">Welcome to Deepfake SaaS</h1>} />
+        <Route path="/" element={<Home/>} />
         <Route path="/login" element={<Login/>} />
         <Route path='/signup' element={<SignUp/>} />
+        <Route path='/dashboard' element={<Dashboard/>} />
       </Routes>
     </div>
     <h1>hello</h1>
