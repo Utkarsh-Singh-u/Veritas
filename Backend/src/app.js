@@ -4,12 +4,31 @@ import cookieParser from "cookie-parser";
 
 const app=express();
 
+// app.use(
+//   cors({
+//     origin: ["http://localhost:5173", "http://localhost:5174","http://127.0.0.1:8000"],
+//     credentials:true
+//   })
+// );
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:8000",
+];
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174","http://127.0.0.1:8000"],
-    credentials:true
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin) || origin.startsWith("chrome-extension://")) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-api-key"]
   })
 );
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended:true }));

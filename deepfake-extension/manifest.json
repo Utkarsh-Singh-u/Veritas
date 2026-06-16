@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "DeepFake Guard AI",
+  "version": "1.0",
+  "description": "Right-click any image to instantly scan for AI manipulations.",
+  "permissions": [
+    "contextMenus",
+    "storage",
+    "scripting",
+    "activeTab"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
