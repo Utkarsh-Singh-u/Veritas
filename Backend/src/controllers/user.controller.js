@@ -22,8 +22,9 @@ const generateAccessAndRefreshToken = async (userId) => {
 
 const registerUser = asyncHandler(async (req,res)=>{
   try{
+    // console.log(1);
     const {fullname,email,password} = req.body;
-    if([fullname, email, password].some((field)=> field?.trim()==="")){
+    if([fullname, email, password].some((field)=> !field || field.trim() === "")){
       return res.status(400).json({message:"All fields are required"});
     }
     const existedUser=await User.findOne({email});
