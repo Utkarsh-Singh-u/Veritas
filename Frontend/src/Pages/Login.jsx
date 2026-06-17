@@ -203,7 +203,7 @@ function Login () {
  
                <p className="su-foot">
                  Don't have an API account?{" "}
-                 <Link to="/register" className="su-link">
+                 <Link to="/signup" className="su-link">
                    Sign up
                  </Link>
                </p>
