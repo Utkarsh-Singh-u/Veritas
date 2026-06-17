@@ -1,16 +1,30 @@
-import React, { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { UserDataContext } from "../Context/UserContext";
+import "./Dashboard.css";
+
+const FONT_LINK_ID = "db-paper-fonts";
+function useFonts() {
+  useEffect(() => {
+    if (document.getElementById(FONT_LINK_ID)) return;
+    const link = document.createElement("link");
+    link.id = FONT_LINK_ID;
+    link.rel = "stylesheet";
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Special+Elite&family=Inter:wght@400;500;600&display=swap";
+    document.head.appendChild(link);
+  }, []);
+}
 
 export default function Dashboard() {
+  useFonts();
   const { user, setUser } = useContext(UserDataContext);
   const [copied, setCopied] = useState(false);
   const [showKey, setShowKey] = useState(false);
   const [loadingKey, setLoadingKey] = useState(false);
   const navigate = useNavigate();
 
-  // Handle logging out
   const handleLogout = async () => {
     try {
       await axios.get(`${import.meta.env.VITE_BASE_URL}/api/v1/user/logout`, {
@@ -24,22 +38,15 @@ export default function Dashboard() {
     }
   };
 
-  // Triggered when a user clicks "Generate New Key"
   const handleGenerateKey = async () => {
     setLoadingKey(true);
     try {
       const response = await axios.post(
-      `${import.meta.env.VITE_BASE_URL}/api/v1/user/getapikey`,
-      {},
-      {
-        withCredentials: true,
-      }
-    );
-      
-      // Update global context state so the UI reflects the new key instantly
-      setUser(response.data.user); 
-      
-      // Update local storage copy
+        `${import.meta.env.VITE_BASE_URL}/api/v1/user/getapikey`,
+        {},
+        { withCredentials: true }
+      );
+      setUser(response.data.user);
       localStorage.setItem("saas_user", JSON.stringify(response.data.user));
       setShowKey(true);
     } catch (err) {
@@ -49,7 +56,6 @@ export default function Dashboard() {
     }
   };
 
-  // Copy to clipboard function
   const copyToClipboard = () => {
     if (user?.apiKey) {
       navigator.clipboard.writeText(user.apiKey);
@@ -58,130 +64,163 @@ export default function Dashboard() {
     }
   };
 
-  // Security Guard: If no user is logged in, show an access denied state
   if (!user) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-4">
-        <h2 className="text-2xl font-bold text-red-500 mb-4">Access Denied 🔒</h2>
-        <p className="text-slate-400 mb-6">Please log in to view your developer dashboard.</p>
-        <button onClick={() => navigate("/login")} className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded font-semibold transition-colors">
+      <div className="db-denied">
+        <h2 className="db-denied-title">Access Denied</h2>
+        <p className="db-denied-sub">Please log in to view your developer dashboard.</p>
+        <button className="db-btn db-btn--primary" onClick={() => navigate("/login")}>
           Go to Login
         </button>
       </div>
     );
   }
 
-  // Calculate API usage percentage safely
-  const usagePercentage = Math.min(((user.apiUsageCount || 0) / (user.apiLimit || 100)) * 100, 100);
+  const usagePercentage = Math.min(
+    ((user.apiUsageCount || 0) / (user.apiLimit || 100)) * 100,
+    100
+  );
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white font-sans">
-      {/* Top Navigation Bar */}
-      <nav className="flex justify-between items-center px-8 py-4 bg-slate-800 border-b border-slate-700">
-        <div className="flex items-center space-x-2">
-          <span className="text-2xl">🛡️</span>
-          <h1 className="text-xl font-bold tracking-wide text-blue-400">DeepFake Guard AI</h1>
-        </div>
-        <div className="flex items-center space-x-6">
-          <span className="text-slate-300">Welcome, <strong className="text-white">{user.fullname}</strong></span>
-          <button onClick={handleLogout} className="px-4 py-1.5 bg-slate-700 hover:bg-red-600 border border-slate-600 hover:border-red-600 text-sm font-semibold rounded-md transition-all">
+    <div className="db-root">
+      {/* ── Nav ── */}
+      <nav className="db-nav">
+        <Link className="db-nav-brand" to="/" style={{ textDecoration: 'none' }}>
+          <div className="db-nav-icon">
+            <svg width="26" height="26" viewBox="0 0 56 56" fill="none">
+              <circle cx="28" cy="28" r="25" stroke="#B5563C" strokeWidth="1.6" />
+              <circle cx="28" cy="28" r="19.5" stroke="#B5563C" strokeWidth="0.9" />
+              <path
+                d="M28 16 L36 21 V31 L28 36 L20 31 V21 Z"
+                stroke="#B5563C"
+                strokeWidth="1.4"
+                fill="none"
+              />
+              <circle cx="28" cy="26" r="2" fill="#B5563C" />
+            </svg>
+          </div>
+          <h1 className="db-nav-title">DeepFake Guard AI</h1>
+        </Link>
+
+        <div className="db-nav-right">
+          <span className="db-nav-welcome">
+            Welcome, <strong>{user.fullname}</strong>
+          </span>
+          <button className="db-nav-signout" onClick={handleLogout}>
             Sign Out
           </button>
         </div>
       </nav>
 
-      {/* Main Container */}
-      <main className="max-w-5xl mx-auto px-6 py-10 space-y-8">
-        
-        {/* Metric Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* Card 1: Account Overview */}
-          <div className="p-6 bg-slate-800 border border-slate-700 rounded-xl shadow-md space-y-3">
-            <h3 className="text-slate-400 font-semibold tracking-wider uppercase text-xs">Account Details</h3>
-            <p className="text-lg font-medium">{user.fullname}</p>
-            <p className="text-sm text-slate-400 bg-slate-900/50 p-2 rounded border border-slate-700/50 break-all">{user.email}</p>
+      {/* ── Main ── */}
+      <main className="db-main">
+        {/* Page heading */}
+        <div>
+          <span className="db-page-kicker">VERITAS API — DEVELOPER DASHBOARD</span>
+          <h2 className="db-page-title">Your credentials</h2>
+        </div>
+
+        {/* Two metric cards */}
+        <div className="db-grid">
+          {/* Account details */}
+          <div className="db-card db-card--tilt-l">
+            <span className="db-card-kicker">Account Details</span>
+            <p className="db-account-name">{user.fullname}</p>
+            <p className="db-account-email">{user.email}</p>
           </div>
 
-          {/* Card 2: API Request Limit Metrics */}
-          <div className="p-6 bg-slate-800 border border-slate-700 rounded-xl shadow-md space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-slate-400 font-semibold tracking-wider uppercase text-xs">API Usage Quota</h3>
-              <span className="text-xs bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full font-mono">
-                {user.apiUsageCount} / {user.apiLimit} Scans
+          {/* Usage quota */}
+          <div className="db-card db-card--tilt-r">
+            <span className="db-card-kicker">API Usage Quota</span>
+            <div className="db-usage-meta">
+              <span className="db-usage-count">
+                {user.apiUsageCount} / {user.apiLimit} scans
               </span>
             </div>
-            
-            {/* Custom Progress Bar */}
-            <div className="w-full bg-slate-700 h-3 rounded-full overflow-hidden">
-              <div 
-                className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full transition-all duration-500" 
+            <div className="db-progress-track">
+              <div
+                className="db-progress-fill"
                 style={{ width: `${usagePercentage}%` }}
               />
             </div>
-            
-            <p className="text-xs text-slate-400">
-              You have <span className="text-white font-semibold">{user.apiLimit - user.apiUsageCount}</span> free server prediction requests remaining this billing cycle.
+            <p className="db-usage-caption">
+              <strong>{user.apiLimit - user.apiUsageCount}</strong> free requests
+              remaining this billing cycle.
             </p>
           </div>
         </div>
 
-        {/* Bottom Section: API Credentials Management Component */}
-        <div className="p-8 bg-slate-800 border border-slate-700 rounded-xl shadow-md space-y-6">
-          <div>
-            <h2 className="text-xl font-bold">Your Secret API Key</h2>
-            <p className="text-sm text-slate-400 mt-1">Use this key to authorize image payloads scanning against your custom software solutions.</p>
-          </div>
+        {/* API key card */}
+        <div className="db-card">
+          <h3 className="db-section-title">Secret API Key</h3>
+          <p className="db-section-sub">
+            Use this key to authorise image payloads against your integration.
+          </p>
+
+          <div className="db-divider" />
 
           {user.apiKey ? (
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-3">
-              <div className="flex-1 flex items-center bg-slate-900 px-4 py-3 rounded-lg border border-slate-700 font-mono text-sm break-all">
-                <span className="text-slate-500 mr-2 select-none">KEY:</span>
-                <input 
-                  type={showKey ? "text" : "password"} 
-                  value={user.apiKey} 
-                  readOnly 
-                  className="bg-transparent border-none outline-none w-full text-blue-300"
-                />
+            <>
+              <div className="db-key-row">
+                <div className="db-key-shell">
+                  <span className="db-key-prefix">KEY:</span>
+                  <input
+                    type={showKey ? "text" : "password"}
+                    value={user.apiKey}
+                    readOnly
+                    className="db-key-input"
+                  />
+                </div>
+
+                <div className="db-key-actions">
+                  <button
+                    className="db-btn db-btn--ghost"
+                    onClick={() => setShowKey((v) => !v)}
+                  >
+                    {showKey ? "Hide" : "Reveal"}
+                  </button>
+                  <button
+                    className={`db-btn ${copied ? "db-btn--success" : "db-btn--primary"}`}
+                    onClick={copyToClipboard}
+                  >
+                    {copied ? "Copied ✓" : "Copy"}
+                  </button>
+                </div>
               </div>
-              
-              <div className="flex space-x-2">
-                <button 
-                  onClick={() => setShowKey(!showKey)}
-                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-md font-medium text-sm transition-colors"
-                >
-                  {showKey ? "Hide" : "Reveal"}
-                </button>
-                <button 
-                  onClick={copyToClipboard}
-                  className={`px-4 py-2 rounded-md font-medium text-sm transition-all text-white ${copied ? "bg-green-600" : "bg-blue-600 hover:bg-blue-700"}`}
-                >
-                  {copied ? "Copied! ✓" : "Copy"}
-                </button>
-              </div>
-            </div>
+            </>
           ) : (
-            <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-lg text-sm">
-              You haven't provisioned an API credentials handshake token yet. Generate one below to activate developer tooling configurations.
+            <div className="db-no-key">
+              No key provisioned yet. Generate one below to activate developer tooling.
             </div>
           )}
 
-          <div className="pt-2 border-t border-slate-700/60">
-            <button 
-              onClick={handleGenerateKey}
-              disabled={loadingKey}
-              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-bold rounded-md shadow-md transition-all disabled:opacity-50"
-            >
-              {loadingKey ? "Generating Vector Strings..." : user.apiKey ? "Regenerate New API Key" : "Generate First API Key"}
-            </button>
-            {user.apiKey && (
-              <p className="text-xs text-red-400 mt-2">
-                ⚠️ Warning: Regenerating will revoke access immediately on any running browser systems utilizing your older key string.
-              </p>
+          <div className="db-divider" />
+
+          <button
+            className="db-btn db-btn--primary db-btn--generate"
+            onClick={handleGenerateKey}
+            disabled={loadingKey}
+          >
+            {loadingKey ? (
+              <>
+                <span className="db-spinner" aria-hidden="true" />
+                Issuing key…
+              </>
+            ) : user.apiKey ? (
+              "Regenerate API Key"
+            ) : (
+              "Generate First API Key"
             )}
-          </div>
+          </button>
+
+          {user.apiKey && (
+            <p className="db-regen-warning">
+              ⚠ Regenerating revokes the current key immediately.
+            </p>
+          )}
         </div>
 
+        <p className="db-caption">No. 0427 — issued on request</p>
       </main>
     </div>
   );

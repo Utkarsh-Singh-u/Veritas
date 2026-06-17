@@ -9,8 +9,7 @@ import Home from './Pages/Home';
 function App() {
 
   return (
-    <>
-    <div className="relative font-sans">
+    <div>
       <Routes>
         <Route path="/" element={<Home/>} />
         <Route path="/login" element={<Login/>} />
@@ -18,8 +17,6 @@ function App() {
         <Route path='/dashboard' element={<Dashboard/>} />
       </Routes>
     </div>
-    <h1>hello</h1>
-    </>
   )
 }
 

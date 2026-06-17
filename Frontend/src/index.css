@@ -4,6 +4,8 @@
 
 /* Add a sleek dark background for our SaaS app */
 body {
-  background-color: #0f172a; /* Tailwind's slate-900 */
-  color: white;
+  background-color: #EFE7D8; /* Tailwind's slate-900 */
+  color: #2B2620;
+  margin: 0;
+  padding: 0;
 }

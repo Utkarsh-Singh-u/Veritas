@@ -1,0 +1,429 @@
+/* ── Google Fonts (same as SignUp) ─────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Special+Elite&family=Inter:wght@400;500;600&display=swap");
+
+/* ── Reset ─────────────────────────────────────────────────────── */
+.db-root * { box-sizing: border-box; }
+
+/* ── Root / page ───────────────────────────────────────────────── */
+.db-root {
+  min-height: 100vh;
+  width: 100%;
+  background: #EFE7D8;
+  background-image:
+    radial-gradient(circle at 20% 15%, rgba(0,0,0,0.025) 0, transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(0,0,0,0.03) 0, transparent 50%);
+  font-family: 'Inter', sans-serif;
+  color: #2B2620;
+}
+
+/* ── Nav bar ───────────────────────────────────────────────────── */
+.db-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 36px;
+  background: #FBF6EA;
+  border-bottom: 1.4px solid #DDD2B8;
+  box-shadow: 0 2px 8px -4px rgba(60,48,28,0.18);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.db-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.db-nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.db-nav-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 19px;
+  color: #2B2620;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.db-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.db-nav-welcome {
+  font-size: 13px;
+  color: #6B6253;
+}
+
+.db-nav-welcome strong {
+  color: #2B2620;
+  font-weight: 600;
+}
+
+.db-nav-signout {
+  font-family: 'Special Elite', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8A7E63;
+  background: transparent;
+  border: 1.4px solid #C9BFA8;
+  border-radius: 2px;
+  padding: 6px 13px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.db-nav-signout:hover {
+  color: #FBF6EA;
+  background: #B5563C;
+  border-color: #B5563C;
+}
+.db-nav-signout:focus-visible {
+  outline: 2px solid #B5563C;
+  outline-offset: 2px;
+}
+
+/* ── Main layout ───────────────────────────────────────────────── */
+.db-main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ── Page heading ──────────────────────────────────────────────── */
+.db-page-kicker {
+  font-family: 'Special Elite', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: #8A7E63;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.db-page-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 1.2;
+  color: #2B2620;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* ── Card (the main paper element) ────────────────────────────── */
+.db-card {
+  background: #FBF6EA;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.012) 0px, transparent 1px, transparent 3px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.012) 0px, transparent 1px, transparent 3px);
+  border: 1px solid #DDD2B8;
+  border-radius: 3px;
+  padding: 30px 32px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.6) inset,
+    0 18px 40px -22px rgba(60,48,28,0.3),
+    0 2px 0 rgba(60,48,28,0.06);
+}
+
+/* slight tilt variation – applied per card via modifier */
+.db-card--tilt-l { transform: rotate(-0.4deg); }
+.db-card--tilt-r { transform: rotate(0.35deg); }
+
+/* ── Two-column grid ───────────────────────────────────────────── */
+.db-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 600px) {
+  .db-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Card section label ────────────────────────────────────────── */
+.db-card-kicker {
+  font-family: 'Special Elite', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: #8A7E63;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 14px;
+}
+
+/* ── Divider (dashed, matching signup) ─────────────────────────── */
+.db-divider {
+  height: 0;
+  border-top: 1.4px dashed #D2C5A4;
+  margin: 20px 0;
+}
+
+/* ── Account details card ──────────────────────────────────────── */
+.db-account-name {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: #2B2620;
+  margin: 0 0 8px;
+}
+
+.db-account-email {
+  font-size: 13px;
+  color: #6B6253;
+  background: rgba(0,0,0,0.03);
+  border: 1px solid #DDD2B8;
+  border-radius: 2px;
+  padding: 7px 10px;
+  word-break: break-all;
+  margin: 0;
+  font-family: 'Special Elite', monospace;
+  letter-spacing: 0.02em;
+}
+
+/* ── Usage quota card ──────────────────────────────────────────── */
+.db-usage-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.db-usage-count {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: #8A7E63;
+  white-space: nowrap;
+}
+
+/* Progress track */
+.db-progress-track {
+  width: 100%;
+  height: 6px;
+  background: #DDD2B8;
+  border-radius: 0;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.db-progress-fill {
+  height: 100%;
+  background: #B5563C;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.db-usage-caption {
+  font-size: 12px;
+  color: #8A7E63;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.db-usage-caption strong {
+  color: #2B2620;
+  font-weight: 600;
+}
+
+/* ── API Key section ───────────────────────────────────────────── */
+.db-section-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 22px;
+  color: #2B2620;
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+}
+
+.db-section-sub {
+  font-size: 13px;
+  color: #6B6253;
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* Key input row */
+.db-key-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.db-key-shell {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1.4px solid #C9BFA8;
+  padding: 7px 2px 9px;
+  transition: border-color 0.15s;
+}
+.db-key-shell:focus-within { border-bottom-color: #B5563C; }
+
+.db-key-prefix {
+  font-family: 'Special Elite', monospace;
+  font-size: 10.5px;
+  color: #9C9078;
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.db-key-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px;
+  color: #2B2620;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Key action buttons */
+.db-key-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.db-btn {
+  font-family: 'Special Elite', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s, transform 0.1s;
+  appearance: none;
+  border: 1.4px solid;
+}
+.db-btn:active { transform: translateY(1px); }
+.db-btn:focus-visible { outline: 2px solid #B5563C; outline-offset: 2px; }
+.db-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Ghost (outline) variant */
+.db-btn--ghost {
+  background: transparent;
+  border-color: #C9BFA8;
+  color: #6B6253;
+}
+.db-btn--ghost:hover:not(:disabled) {
+  border-color: #8A7E63;
+  color: #2B2620;
+}
+
+/* Filled (primary) variant */
+.db-btn--primary {
+  background: #2B2620;
+  border-color: #2B2620;
+  color: #FBF6EA;
+}
+.db-btn--primary:hover:not(:disabled) {
+  background: #B5563C;
+  border-color: #B5563C;
+}
+
+/* Success / copied state */
+.db-btn--success {
+  background: #7C8A6E;
+  border-color: #7C8A6E;
+  color: #FBF6EA;
+}
+
+/* Generate key button – full width, a bit taller */
+.db-btn--generate {
+  width: 100%;
+  padding: 12px;
+  font-size: 11.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ── No-key notice ─────────────────────────────────────────────── */
+.db-no-key {
+  background: #F4E2D8;
+  border: 1px solid #DDB69E;
+  color: #8C4A30;
+  font-size: 12.5px;
+  padding: 10px 13px;
+  border-radius: 2px;
+  line-height: 1.5;
+}
+
+/* ── Regen warning ─────────────────────────────────────────────── */
+.db-regen-warning {
+  font-size: 11.5px;
+  color: #B5563C;
+  margin: 10px 0 0;
+}
+
+/* ── Spinner (reuses su-seal-spin logic) ───────────────────────── */
+.db-spinner {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.6px solid rgba(251,246,234,0.35);
+  border-top-color: #FBF6EA;
+  display: inline-block;
+  animation: db-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes db-spin { to { transform: rotate(360deg); } }
+
+/* ── Access denied state ───────────────────────────────────────── */
+.db-denied {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 20px;
+  background: #EFE7D8;
+  font-family: 'Inter', sans-serif;
+}
+.db-denied-title {
+  font-family: 'Fraunces', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: #B5563C;
+  margin: 0;
+}
+.db-denied-sub {
+  font-size: 14px;
+  color: #6B6253;
+  margin: 0;
+}
+
+/* ── Footer caption ────────────────────────────────────────────── */
+.db-caption {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px;
+  color: #9C9078;
+  letter-spacing: 0.03em;
+  text-align: center;
+  margin: 0;
+}
+
+/* ── Reduced motion ────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .db-spinner { animation: none !important; }
+  .db-progress-fill { transition: none !important; }
+}
