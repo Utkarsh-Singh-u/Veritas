@@ -3,6 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { UserDataContext } from "../Context/UserContext";
 import "./Home.css";
+import img1 from "../assets/1.png";
+import img2 from "../assets/2.avif";
+import img3 from "../assets/3.png";
+import img4 from "../assets/4.jpg";
+import img5 from "../assets/5.png";
 
 /* ── Google Fonts loader ──────────────────────────────────────── */
 const FONT_LINK_ID = "hm-paper-fonts";
@@ -23,50 +28,77 @@ const SLIDES = [
   {
     id: 1,
     verdict: "fake",
-    confidence: 97,
-    icon: "🖼️",
+    confidence: 87,
+    icon: img1,
     title: "GAN-Generated Portrait",
-    desc: "Classic StyleGAN output — subtle ear asymmetry and background texture inconsistency flagged by the model.",
+    desc: "Subtle ear asymmetry and background texture inconsistency flagged at patch level by Swinv2.",
   },
   {
     id: 2,
     verdict: "real",
-    confidence: 94,
-    icon: "📷",
-    title: "Press Photograph",
-    desc: "Authentic DSLR capture. Natural sensor noise pattern and consistent lighting geometry confirmed as genuine.",
+    confidence: 99,
+    icon: img2,
+    title: "Verified Sports Action Capture",
+    desc: "Authentic high-speed telephoto frame. Natural motion blur vectors and stadium floodlight geometry confirmed genuine. Unaltered DSLR burst capture.",
   },
   {
     id: 3,
     verdict: "fake",
-    confidence: 89,
-    icon: "🤳",
+    confidence: 79,
+    icon: img3,
     title: "Face-Swap Selfie",
     desc: "Diffusion-based face replacement. Skin-tone boundary artefacts around the jawline exposed the swap.",
   },
   {
     id: 4,
     verdict: "real",
-    confidence: 91,
-    icon: "🏙️",
+    confidence: 96,
+    icon: img4,
     title: "News Scene Photo",
-    desc: "Original photojournalism image. Consistent shadow directions and unmanipulated EXIF metadata verified.",
+    desc: "Original photojournalism. Consistent shadow directions and unmanipulated EXIF metadata verified.",
   },
   {
     id: 5,
     verdict: "fake",
-    confidence: 99,
-    icon: "🧑‍💻",
+    confidence: 75,
+    icon: img5,
     title: "Fully Synthetic Headshot",
-    desc: "Zero real pixels. ViT model detected perfect symmetry and telltale frequency-domain fingerprints.",
+    desc: "Zero real pixels. Model detected perfect symmetry and telltale frequency-domain fingerprints.",
   },
+];
+
+/* ── Validation metrics ───────────────────────────────────────── */
+const METRICS = [
+  { value: "98.1%", label: "Accuracy",        note: "val · step 69,840",       accent: "red"   },
+  { value: "99.5%", label: "AUC",             note: "area under ROC curve",     accent: "green" },
+  { value: "98.8%", label: "F1 Score",        note: "harmonic mean P/R",        accent: "green" },
+  { value: "0.0859",label: "Validation Loss", note: "cross-entropy",            accent: "muted" },
+  { value: "98.2%", label: "Precision",       note: "positive predictive value",accent: "muted" },
+  { value: "99.3%", label: "Recall",          note: "true positive rate",       accent: "muted" },
+];
+
+/* ── Training config rows ─────────────────────────────────────── */
+const TRAIN_CONFIG = [
+  { key: "Model",        val: "haywoodsloan/ai-image-detector-dev-deploy" },
+  { key: "Architecture", val: "Swin Transformer v2" },
+  { key: "Parameters",   val: "0.2B (F32 · Safetensors)" },
+  { key: "Framework",    val: "AutoTrain · HuggingFace" },
+  { key: "Task",         val: "Image Classification (binary)" },
+];
+
+const TRAIN_RUN = [
+  { key: "Total steps",    val: "69,840" },
+  { key: "Epochs",         val: "6 completed" },
+  { key: "Final LR",       val: "~0 (cosine decay)" },
+  { key: "Train loss",     val: "0.0355 (final)" },
+  { key: "Downloads / mo", val: "144,394" },
 ];
 
 /* ── FAQ data ─────────────────────────────────────────────────── */
 const FAQS = [
   {
     q: "What model powers the detection?",
-    a: "We use a Vision Transformer (ViT-B/16) fine-tuned on a curated dataset of 2.4 million real and synthetic images spanning GAN, diffusion, and face-swap techniques.",
+    a: "A Swin Transformer v2 (swinv2) fine-tuned via HuggingFace AutoTrain on a binary image classification task. The model has 0.2B parameters stored in F32 Safetensors format and achieved 98.1% validation accuracy over ~70k training steps.",
   },
   {
     q: "What image formats are supported?",
@@ -74,7 +106,7 @@ const FAQS = [
   },
   {
     q: "How is the confidence score calculated?",
-    a: "The model outputs a softmax probability over two classes. The confidence score is the probability assigned to the winning class, expressed as a percentage.",
+    a: "The model outputs a softmax probability over two classes (real / fake). The confidence score is the probability assigned to the winning class, expressed as a percentage.",
   },
   {
     q: "Is my uploaded image stored?",
@@ -91,20 +123,19 @@ const FAQS = [
 ══════════════════════════════════════════════════════════════ */
 export default function Home() {
   useFonts();
-  const { user } = useContext(UserDataContext);
+  const { user,setUser } = useContext(UserDataContext);
   const navigate = useNavigate();
 
   /* Scanner state */
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [isScanning, setIsScanning] = useState(false);
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState(null);
+  const [selectedFile, setSelectedFile]   = useState(null);
+  const [previewUrl,   setPreviewUrl]     = useState(null);
+  const [isScanning,   setIsScanning]     = useState(false);
+  const [result,       setResult]         = useState(null);
+  const [error,        setError]          = useState(null);
 
   /* Slideshow state */
   const [slideIndex, setSlideIndex] = useState(0);
-  const slidesPerView = 3; // updated responsively below via resize observer
-  const maxIndex = SLIDES.length - 1;
+  const MAX_SLIDE = SLIDES.length - 3; // last index where 3 slides still fit
 
   /* FAQ state */
   const [openFaq, setOpenFaq] = useState(null);
@@ -138,6 +169,11 @@ export default function Home() {
         }
       );
       setResult(response.data.data);
+      // console.log(response.data);
+      setUser((prevUser) => ({
+        ...prevUser,
+        apiUsageCount: response.data.apiUsageCount 
+      }));
     } catch (err) {
       setError(err.response?.data?.message || "Failed to scan image.");
     } finally {
@@ -147,19 +183,22 @@ export default function Home() {
 
   /* ── Slideshow ────────────────────────────────────────────── */
   const prevSlide = () => setSlideIndex((i) => Math.max(0, i - 1));
-  const nextSlide = () => setSlideIndex((i) => Math.min(maxIndex, i + 1));
+  const nextSlide = () => setSlideIndex((i) => Math.min(MAX_SLIDE, i + 1));
 
-  /* translate: each slide is calc(33.333% - 14px) + 20px gap */
+  /* each slide is calc(33.333% - 14px), gap is 20px */
   const slideTranslate = `translateX(calc(-${slideIndex} * (33.333% + 6.67px)))`;
 
   /* ── FAQ ──────────────────────────────────────────────────── */
   const toggleFaq = (i) => setOpenFaq((prev) => (prev === i ? null : i));
 
-  /* ── Render action button ─────────────────────────────────── */
+  /* ── Scan button ──────────────────────────────────────────── */
   const renderScanBtn = () => {
     if (!user) {
       return (
-        <button className="hm-scan-btn hm-scan-btn--login" onClick={() => navigate("/login")}>
+        <button
+          className="hm-scan-btn hm-scan-btn--login"
+          onClick={() => navigate("/login")}
+        >
           Log in to Scan Free
         </button>
       );
@@ -200,6 +239,7 @@ export default function Home() {
   ══════════════════════════════════════════════════════════ */
   return (
     <div className="hm-root">
+
       {/* ── NAV ─────────────────────────────────────────────── */}
       <nav className="hm-nav">
         <Link to="/" className="hm-nav-brand">
@@ -222,12 +262,8 @@ export default function Home() {
             </>
           ) : (
             <>
-              <Link to="/login" className="hm-nav-btn hm-nav-btn--ghost">
-                Developer Login
-              </Link>
-              <Link to="/register" className="hm-nav-btn hm-nav-btn--fill">
-                Get API Key
-              </Link>
+              <Link to="/login"    className="hm-nav-btn hm-nav-btn--ghost">Developer Login</Link>
+              <Link to="/register" className="hm-nav-btn hm-nav-btn--fill">Get API Key</Link>
             </>
           )}
         </div>
@@ -241,24 +277,33 @@ export default function Home() {
             Is that face<br /><em>real</em> or fabricated?
           </h2>
           <p className="hm-hero-sub">
-            Our Vision Transformer model scrutinises pixel-level artefacts,
-            frequency signatures, and semantic inconsistencies to give you a
+            Our Swin Transformer v2 model scrutinises pixel-level artefacts,
+            frequency signatures, and semantic inconsistencies — delivering a
             verdict in under two seconds.
           </p>
 
           <div className="hm-hero-stats">
             <div className="hm-stat-pill">
-              <span className="hm-stat-num">97.3%</span>
+              <span className="hm-stat-num">98.1%</span>
               <span className="hm-stat-label">Accuracy</span>
+            </div>
+            <div className="hm-stat-pill">
+              <span className="hm-stat-num">99.5%</span>
+              <span className="hm-stat-label">AUC Score</span>
             </div>
             <div className="hm-stat-pill">
               <span className="hm-stat-num">&lt;2s</span>
               <span className="hm-stat-label">Per scan</span>
             </div>
             <div className="hm-stat-pill">
-              <span className="hm-stat-num">2.4M</span>
-              <span className="hm-stat-label">Training imgs</span>
+              <span className="hm-stat-num">0.2B</span>
+              <span className="hm-stat-label">Parameters</span>
             </div>
+          </div>
+
+          <div className="hm-model-tag">
+            <span className="hm-model-dot" />
+            Swinv2 · AutoTrain · HuggingFace
           </div>
         </div>
 
@@ -277,7 +322,7 @@ export default function Home() {
               <div className="hm-dropzone-placeholder">
                 <span className="hm-dropzone-icon">📄</span>
                 <span className="hm-dropzone-hint">Click to upload</span>
-                <span className="hm-dropzone-sub">JPG · PNG · WEBP</span>
+                <span className="hm-dropzone-sub">JPG · PNG · WEBP · max 10 MB</span>
               </div>
             )}
             <input
@@ -313,10 +358,12 @@ export default function Home() {
       <div className="hm-tech-strip">
         <div className="hm-tech-inner">
           {[
-            { value: "ViT-B/16", label: "Model architecture" },
-            { value: "10ms", label: "GPU inference time" },
-            { value: "99.1%", label: "GAN detection rate" },
-            { value: "REST", label: "API interface" },
+            { value: "Swinv2",  label: "Architecture"   },
+            { value: "98.8%",   label: "F1 Score"       },
+            { value: "98.2%",   label: "Precision"      },
+            { value: "99.3%",   label: "Recall"         },
+            { value: "0.2B",    label: "Parameters"     },
+            { value: "REST",    label: "API Interface"  },
           ].map((t) => (
             <div className="hm-tech-item" key={t.label}>
               <span className="hm-tech-value">{t.value}</span>
@@ -325,6 +372,49 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      {/* ── VALIDATED METRICS ───────────────────────────────── */}
+      <section className="hm-section">
+        <span className="hm-section-kicker">Validated Performance</span>
+        <h3 className="hm-section-title">Real numbers from the trained model</h3>
+        <p className="hm-section-sub">
+          Metrics taken directly from the AutoTrain validation run —
+          69,840 training steps, 6 epochs completed.
+        </p>
+
+        <div className="hm-metrics-grid">
+          {METRICS.map((m) => (
+            <div className={`hm-metric-card hm-metric-card--${m.accent}`} key={m.label}>
+              <div className="hm-metric-val">{m.value}</div>
+              <div className="hm-metric-lbl">{m.label}</div>
+              <div className="hm-metric-note">{m.note}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="hm-training-info">
+          <div className="hm-train-card">
+            <div className="hm-train-title">Training Configuration</div>
+            {TRAIN_CONFIG.map((r) => (
+              <div className="hm-train-row" key={r.key}>
+                <span className="hm-train-key">{r.key}</span>
+                <span className="hm-train-val">{r.val}</span>
+              </div>
+            ))}
+          </div>
+          <div className="hm-train-card">
+            <div className="hm-train-title">Run Details</div>
+            {TRAIN_RUN.map((r) => (
+              <div className="hm-train-row" key={r.key}>
+                <span className="hm-train-key">{r.key}</span>
+                <span className="hm-train-val">{r.val}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <hr className="hm-rule" />
 
       {/* ── SLIDESHOW ───────────────────────────────────────── */}
       <section className="hm-section">
@@ -346,7 +436,7 @@ export default function Home() {
                 className={`hm-slide hm-slide--${slide.verdict}`}
               >
                 <div className="hm-slide-img-wrap">
-                  <div className="hm-slide-placeholder">{slide.icon}</div>
+                  <div className="hm-slide-placeholder"><img src={slide.icon} className="w-full h-full object-contain" /></div>
                   <span className={`hm-slide-badge hm-slide-badge--${slide.verdict}`}>
                     {slide.verdict}
                   </span>
@@ -382,10 +472,18 @@ export default function Home() {
             ))}
           </div>
           <div className="hm-slideshow-arrows">
-            <button className="hm-arrow" onClick={prevSlide} disabled={slideIndex === 0}>
+            <button
+              className="hm-arrow"
+              onClick={prevSlide}
+              disabled={slideIndex === 0}
+            >
               ← Prev
             </button>
-            <button className="hm-arrow" onClick={nextSlide} disabled={slideIndex >= SLIDES.length - 3}>
+            <button
+              className="hm-arrow"
+              onClick={nextSlide}
+              disabled={slideIndex >= MAX_SLIDE}
+            >
               Next →
             </button>
           </div>
@@ -408,12 +506,12 @@ export default function Home() {
             {
               num: "01",
               title: "Upload the image",
-              desc: "POST a JPEG, PNG, or WEBP file to our endpoint via the REST API or the scanner above. No account required for a quick test.",
+              desc: "POST a JPEG, PNG, or WEBP file (max 10 MB) to our endpoint via the REST API or the scanner above. Pass your API key in the x-api-key header.",
             },
             {
               num: "02",
-              title: "ViT analyses the pixels",
-              desc: "Our Vision Transformer scans the image at patch level, identifying GAN fingerprints, diffusion artefacts, and compression inconsistencies invisible to the human eye.",
+              title: "Swinv2 analyses pixels",
+              desc: "Our Swin Transformer v2 scans the image at patch level, identifying GAN fingerprints, diffusion artefacts, and compression inconsistencies invisible to the human eye.",
             },
             {
               num: "03",
@@ -470,7 +568,7 @@ export default function Home() {
           Create a free account, generate your API key, and make your first
           call in under five minutes.
         </p>
-        <Link to="/register" className="hm-cta-btn">
+        <Link to="/signup" className="hm-cta-btn">
           Create Free Account
         </Link>
       </div>
@@ -480,7 +578,7 @@ export default function Home() {
         <span className="hm-footer-copy">
           © {new Date().getFullYear()} DeepFake Guard AI — VERITAS API
         </span>
-        <span className="hm-footer-serial">No. 0427 — issued on request</span>
+        <span className="hm-footer-serial">Swinv2 · 0.2B params · F32</span>
       </footer>
     </div>
   );

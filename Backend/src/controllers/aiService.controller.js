@@ -24,11 +24,13 @@ export const detectDeepfake = asyncHandler(async (req, res) => {
                 ...formData.getHeaders(),
             },
         });
+        // console.log(req.apiUser);
         // console.log(6);
         return res.status(200).json({
             status: "success",
             message: "Image scanned successfully",
             data: response.data,
+            apiUsageCount: req.apiUser.apiUsageCount,
             scansRemaining: req.apiUser.apiLimit - req.apiUser.apiUsageCount
         });
 

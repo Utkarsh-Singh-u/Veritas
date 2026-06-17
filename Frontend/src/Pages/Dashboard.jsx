@@ -25,6 +25,22 @@ export default function Dashboard() {
   const [loadingKey, setLoadingKey] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchLatestUserData = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/v1/user/me`, {
+          withCredentials: true,
+        });
+        setUser(response.data.user); 
+      } catch (err) {
+        console.error("Failed to fetch fresh user data", err);
+      }
+    };
+    if (user) {
+      fetchLatestUserData();
+    }
+  }, []);
+
   const handleLogout = async () => {
     try {
       await axios.get(`${import.meta.env.VITE_BASE_URL}/api/v1/user/logout`, {
@@ -135,6 +151,7 @@ export default function Dashboard() {
             <div className="db-usage-meta">
               <span className="db-usage-count">
                 {user.apiUsageCount} / {user.apiLimit} scans
+                {console.log(user)}
               </span>
             </div>
             <div className="db-progress-track">
