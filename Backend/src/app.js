@@ -19,7 +19,7 @@ app.use(
   cors({
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin) || origin.startsWith("chrome-extension://")) {
+      if (allowedOrigins.includes(origin) || origin.startsWith("chrome-extension://") || origin.endsWith("-utkarsh-singh-us-projects.vercel.app")) {
         return callback(null, true);
       } else {
         return callback(new Error("Not allowed by CORS"));
