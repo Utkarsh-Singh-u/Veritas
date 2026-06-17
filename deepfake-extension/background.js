@@ -1,4 +1,4 @@
-const BACKEND_URL = "http://localhost:8000/api/v1/ai-service/predict"; // Change to your actual backend URL
+const BACKEND_URL = "https://deepfake-d90n.onrender.com/api/v1/ai-service/predict"; // Change to your actual backend URL
 
 function sendAlertToTab(tabId, message) {
   chrome.scripting.executeScript({
