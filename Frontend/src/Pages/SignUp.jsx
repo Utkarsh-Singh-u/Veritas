@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {UserDataContext} from "../Context/UserContext";
@@ -34,23 +34,56 @@ function SignUp() {
     password: "",
     confirmPassword: "",
   });
+
+  // OTP states
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [otpValues, setOtpValues] = useState(["", "", "", "", "", ""]);
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpVerifying, setOtpVerifying] = useState(false);
+  const [otpError, setOtpError] = useState(null);
+  const [otpSuccessMsg, setOtpSuccessMsg] = useState(null);
+  const [otpCooldown, setOtpCooldown] = useState(0);
+  const otpInputsRef = useRef([]);
+
+  // Cooldown timer for resend
+  useEffect(() => {
+    if (otpCooldown <= 0) return;
+    const timer = setTimeout(() => setOtpCooldown(otpCooldown - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [otpCooldown]);
+
   useEffect(()=>{
     const checkFormValidity=()=>{
       const isValid=
       formData.fullname.trim() !="" &&
       formData.email.includes("@") &&
       formData.password.length >= 6 &&
-      formData.confirmPassword==formData.password;
+      formData.confirmPassword==formData.password &&
+      otpVerified; // Must verify email
 
       setIsFormValid(isValid);
     };
     checkFormValidity();
-  },[formData]);
+  },[formData, otpVerified]);
+
   const handleChange=(e)=>{
     setFormData({...formData,[e.target.name]:e.target.value});
     setErrors({ ...errors, [e.target.name]: null });
     setSubmitError(null);
+
+    // Reset OTP state if email changes after verification
+    if (e.target.name === "email") {
+      if (otpSent || otpVerified) {
+        setOtpSent(false);
+        setOtpVerified(false);
+        setOtpValues(["", "", "", "", "", ""]);
+        setOtpError(null);
+        setOtpSuccessMsg(null);
+      }
+    }
   }
+
   const validateForm = () => {
     const newErrors = {};
     if (!formData.fullname.trim()){
@@ -65,9 +98,113 @@ function SignUp() {
     if (formData.password !== formData.confirmPassword){
       newErrors.confirmPassword = "Passwords do not match.";
     }
+    if (!otpVerified) {
+      newErrors.email = "Please verify your email first.";
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  // Send OTP to email
+  const handleSendOtp = async () => {
+    if (!formData.email.includes("@")) {
+      setErrors({ ...errors, email: "Enter a valid email first." });
+      return;
+    }
+    setOtpSending(true);
+    setOtpError(null);
+    setOtpSuccessMsg(null);
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/otp/send-otp`,
+        { email: formData.email }
+      );
+      setOtpSent(true);
+      setOtpCooldown(60);
+      setOtpSuccessMsg("OTP sent! Check your inbox.");
+      // Focus the first OTP input
+      setTimeout(() => otpInputsRef.current[0]?.focus(), 100);
+    } catch (err) {
+      setOtpError(err.response?.data?.message || "Failed to send OTP.");
+    } finally {
+      setOtpSending(false);
+    }
+  };
+
+  // Handle OTP digit input
+  const handleOtpChange = (index, value) => {
+    if (!/^\d*$/.test(value)) return; // only digits
+    const newOtp = [...otpValues];
+    newOtp[index] = value.slice(-1); // single digit
+    setOtpValues(newOtp);
+    setOtpError(null);
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      otpInputsRef.current[index + 1]?.focus();
+    }
+
+    // Auto-verify when all 6 digits are entered
+    if (value && index === 5) {
+      const fullOtp = newOtp.join("");
+      if (fullOtp.length === 6) {
+        handleVerifyOtp(fullOtp);
+      }
+    }
+  };
+
+  // Handle OTP paste
+  const handleOtpPaste = (e) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (pasted.length === 0) return;
+    const newOtp = [...otpValues];
+    for (let i = 0; i < 6; i++) {
+      newOtp[i] = pasted[i] || "";
+    }
+    setOtpValues(newOtp);
+    if (pasted.length === 6) {
+      handleVerifyOtp(pasted);
+    } else {
+      otpInputsRef.current[Math.min(pasted.length, 5)]?.focus();
+    }
+  };
+
+  // Handle backspace on OTP input
+  const handleOtpKeyDown = (index, e) => {
+    if (e.key === "Backspace" && !otpValues[index] && index > 0) {
+      otpInputsRef.current[index - 1]?.focus();
+    }
+  };
+
+  // Verify OTP
+  const handleVerifyOtp = async (otp) => {
+    const otpCode = otp || otpValues.join("");
+    if (otpCode.length !== 6) {
+      setOtpError("Please enter all 6 digits.");
+      return;
+    }
+    setOtpVerifying(true);
+    setOtpError(null);
+    setOtpSuccessMsg(null);
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/otp/verify-otp`,
+        { email: formData.email, otp: otpCode }
+      );
+      if (res.data.verified) {
+        setOtpVerified(true);
+        setOtpSuccessMsg("Email verified ✓");
+      }
+    } catch (err) {
+      setOtpError(err.response?.data?.message || "Invalid OTP.");
+      setOtpValues(["", "", "", "", "", ""]);
+      setTimeout(() => otpInputsRef.current[0]?.focus(), 100);
+    } finally {
+      setOtpVerifying(false);
+    }
+  };
+
   const handleSubmit=async (e)=>{
     e.preventDefault();
     if(!validateForm()) return;
@@ -176,24 +313,88 @@ function SignUp() {
                   {fieldError("fullname") && <p className="su-error">{errors.fullname}</p>}
                 </div>
   
+                {/* ── Email + OTP verification ── */}
                 <div className="su-field">
                   <label className="su-label" htmlFor="email">
                     Email address
                   </label>
-                  <input
-                    id="email"
-                    type="text"
-                    name="email"
-                    placeholder="you@company.com"
-                    autoComplete="email"
-                    onChange={handleChange}
-                    value={formData.email}
-                    disabled={busy}
-                    className={inputClass("email")}
-                  />
+                  <div className="su-email-row">
+                    <input
+                      id="email"
+                      type="text"
+                      name="email"
+                      placeholder="you@company.com"
+                      autoComplete="email"
+                      onChange={handleChange}
+                      value={formData.email}
+                      disabled={busy || otpVerified}
+                      className={`${inputClass("email")} ${otpVerified ? "su-input--verified" : ""}`}
+                    />
+                    {!otpVerified && (
+                      <button
+                        type="button"
+                        className="su-otp-send-btn"
+                        onClick={handleSendOtp}
+                        disabled={otpSending || otpCooldown > 0 || !formData.email.includes("@") || busy}
+                      >
+                        {otpSending ? (
+                          <span className="su-seal-spin" aria-hidden="true" />
+                        ) : otpCooldown > 0 ? (
+                          `${otpCooldown}s`
+                        ) : otpSent ? (
+                          "Resend"
+                        ) : (
+                          "Verify"
+                        )}
+                      </button>
+                    )}
+                    {otpVerified && (
+                      <span className="su-verified-badge">✓ Verified</span>
+                    )}
+                  </div>
                   {fieldError("email") && <p className="su-error">{errors.email}</p>}
                 </div>
-  
+
+                {/* OTP Input Section */}
+                {otpSent && !otpVerified && (
+                  <div className="su-otp-section">
+                    <label className="su-label">Enter verification code</label>
+                    <div className="su-otp-inputs" onPaste={handleOtpPaste}>
+                      {otpValues.map((digit, idx) => (
+                        <input
+                          key={idx}
+                          ref={(el) => (otpInputsRef.current[idx] = el)}
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={1}
+                          value={digit}
+                          onChange={(e) => handleOtpChange(idx, e.target.value)}
+                          onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                          disabled={otpVerifying}
+                          className={`su-otp-digit ${otpError ? "su-otp-digit--error" : ""}`}
+                          aria-label={`Digit ${idx + 1}`}
+                        />
+                      ))}
+                    </div>
+                    {otpVerifying && (
+                      <p className="su-otp-status">
+                        <span className="su-seal-spin" aria-hidden="true" /> Verifying…
+                      </p>
+                    )}
+                    {otpError && <p className="su-error">{otpError}</p>}
+                    {otpSuccessMsg && !otpVerified && !otpError && (
+                      <p className="su-otp-hint">{otpSuccessMsg}</p>
+                    )}
+                  </div>
+                )}
+
+                {otpVerified && otpSuccessMsg && (
+                  <div className="su-otp-verified-banner">
+                    <span className="su-otp-verified-icon">✓</span>
+                    {otpSuccessMsg}
+                  </div>
+                )}
+
                 <div className="su-row">
                   <div className="su-field">
                     <label className="su-label" htmlFor="password">

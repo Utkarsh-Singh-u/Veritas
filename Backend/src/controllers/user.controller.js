@@ -1,6 +1,7 @@
 import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import crypto from "crypto";
+import { isEmailVerified, clearOtp } from "../utils/otpStore.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -31,6 +32,10 @@ const registerUser = asyncHandler(async (req,res)=>{
     if(existedUser){
       return res.status(409).json({message:"User Already Existed"});
     }
+    // Ensure the email was verified via OTP before registration
+    if (!isEmailVerified(email)) {
+      return res.status(403).json({ message: "Email not verified. Please verify your email with OTP first." });
+    }
     const newApiKey = `df_live_${crypto.randomBytes(24).toString("hex")}`;
     const createUser =await User.create({
       fullname,
@@ -38,6 +43,8 @@ const registerUser = asyncHandler(async (req,res)=>{
       password,
       apiKey: newApiKey
     })
+    // OTP served its purpose — clean it up
+    clearOtp(email);
     
     const createdUser=await User.findById(createUser._id).select("-password");
     if(!createdUser){

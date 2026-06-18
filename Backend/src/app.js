@@ -40,10 +40,12 @@ app.use(cookieParser());
 import UserRouter from "./routes/user.routes.js";
 import AiServiceRouter from "./routes/aiService.routes.js"
 import PaymentRouter from "./routes/payment.routes.js";
+import OtpRouter from "./routes/otp.routes.js";
 
 app.use("/api/v1/user",UserRouter);
 app.use("/api/v1/ai-service",AiServiceRouter);
 app.use("/api/v1/billing", PaymentRouter);
+app.use("/api/v1/otp", OtpRouter);
 
 
 export {app};
