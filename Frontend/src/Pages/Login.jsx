@@ -79,7 +79,7 @@ function Login () {
         localStorage.setItem("saas_user", JSON.stringify(data.user));
         setStamped(true);
         setTimeout(() => {
-          navigate("/dashboard");
+          navigate("/");
         }, 1000);
       }else{
         setSubmitting(false);
