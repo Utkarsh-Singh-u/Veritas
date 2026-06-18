@@ -22,6 +22,37 @@ Built with **React**, **Node.js**, **MongoDB**, **FastAPI**, **Hugging Face Tran
 
 ---
 
+## 🔗 Links
+
+- 🌐 Live App: https://deep-fake-d.vercel.app/
+- 📦 API: https://deepfake-d90n.onrender.com
+- 🤖 AI Service: https://utkarsh-singh-deepfake.hf.space/api/v1/predict/image
+- 📚 Documentation: https://github.com/Utkarsh-Singh-u/Veritas
+- Chrome Extention: Coming Soon
+
+---
+
+## 📸 Screenshots
+
+### Landing Page
+
+![Landing Page](./Frontend/src/assets/landing.png)
+
+### Dashboard
+
+![Dashboard](./Frontend/src/assets/dashboard.png)
+
+### Billing Page
+
+![Billing](./Frontend/src/assets/billing.png)
+
+### Chrome Extension
+
+![Extension](./Frontend/src/assets/extention.png)
+
+
+---
+
 # 📑 Table of Contents
 
 * [Overview](#-overview)
