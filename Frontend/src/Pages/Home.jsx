@@ -249,7 +249,7 @@ export default function Home() {
             <path d="M28 16 L36 21 V31 L28 36 L20 31 V21 Z" stroke="#B5563C" strokeWidth="1.4" fill="none" />
             <circle cx="28" cy="26" r="2" fill="#B5563C" />
           </svg>
-          <h1 className="hm-nav-title">DeepFake Guard AI</h1>
+          <h1 className="hm-nav-title">VERITAS</h1>
         </Link>
 
         <div className="hm-nav-links">
@@ -561,17 +561,27 @@ export default function Home() {
       </section>
 
       {/* ── CTA BANNER ──────────────────────────────────────── */}
-      <div className="hm-cta">
-        <span className="hm-cta-kicker">VERITAS API — GET STARTED</span>
-        <h3 className="hm-cta-title">Ready to integrate deepfake detection?</h3>
-        <p className="hm-cta-sub">
-          Create a free account, generate your API key, and make your first
-          call in under five minutes.
-        </p>
-        <Link to="/signup" className="hm-cta-btn">
-          Create Free Account
-        </Link>
-      </div>
+      {user ?(
+        <>
+          
+        </>
+      ):(
+        <>
+          <div className="hm-cta">
+            <span className="hm-cta-kicker">VERITAS API — GET STARTED</span>
+            <h3 className="hm-cta-title">Ready to integrate deepfake detection?</h3>
+            <p className="hm-cta-sub">
+              Create a free account, generate your API key, and make your first
+              call in under five minutes.
+            </p>
+            <Link to="/signup" className="hm-cta-btn">
+              Create Free Account
+            </Link>
+          </div>
+        </>
+      )
+      }
+      
 
       {/* ── FOOTER ──────────────────────────────────────────── */}
       <footer className="hm-footer">

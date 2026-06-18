@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "DeepFake Guard AI",
+  "name": "Veritas",
   "version": "1.0",
   "description": "Right-click any image to instantly scan for AI manipulations.",
   "permissions": [

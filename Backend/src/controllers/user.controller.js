@@ -139,7 +139,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 const generateApiKey =asyncHandler( async (req, res) => {
     try {
         const userId = req.user?._id; 
-        const newApiKey = `df_live_${crypto.randomBytes(24).toString("hex")}`;
+        const newApiKey = `Veritas_API_${crypto.randomBytes(24).toString("hex")}`;
         const user = await User.findByIdAndUpdate(
             userId,
             { apiKey: newApiKey },
@@ -155,4 +155,10 @@ const generateApiKey =asyncHandler( async (req, res) => {
     }
 });
 
-export {loginUser,logoutUser,registerUser,generateApiKey};
+const getCurrentUser = asyncHandler(async (req, res) => {
+  return res.status(200).json({
+    user: req.user,
+  });
+});
+
+export {loginUser,logoutUser,registerUser,generateApiKey,getCurrentUser};

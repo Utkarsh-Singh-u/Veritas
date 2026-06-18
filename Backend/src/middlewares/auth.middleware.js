@@ -12,7 +12,7 @@ const verifyJWT =asyncHandler( async (req, res, next) => {
   try {
     const decodedToken = jwt.verify(gettoken, process.env.ACCESS_TOKEN_SECRET);
     const user = await User.findById(decodedToken?._id).select(
-      "email"
+      "_id fullname email apiKey apiUsageCount apiLimit paymentHistory"
     );
  
     if (!user) {

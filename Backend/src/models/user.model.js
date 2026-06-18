@@ -38,6 +38,62 @@ const userSchema= new mongoose.Schema(
         type:Number,
         default:100
     },
+    paymentHistory: [
+      {
+        paymentProvider: {
+          type: String,
+          default: "razorpay"
+        },
+        razorpayOrderId: {
+          type: String,
+          default: null
+        },
+        razorpayPaymentId: {
+          type: String,
+          default: null
+        },
+        razorpaySignature: {
+          type: String,
+          default: null
+        },
+        packageId: {
+          type: String,
+          required: true
+        },
+        packageName: {
+          type: String,
+          required: true
+        },
+        creditsPurchased: {
+          type: Number,
+          required: true
+        },
+        amount: {
+          type: Number,
+          required: true
+        },
+        currency: {
+          type: String,
+          default: "usd"
+        },
+        status: {
+          type: String,
+          default: "paid"
+        },
+        purchasedAt: {
+          type: Date,
+          default: Date.now
+        },
+        apiLimitBefore: {
+          type: Number,
+          required: true
+        },
+        apiLimitAfter: {
+          type: Number,
+          required: true
+        }
+      }
+    ],
     refreshToken:{
       type:String,
 
