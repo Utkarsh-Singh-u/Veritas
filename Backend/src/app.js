@@ -13,7 +13,8 @@ const app=express();
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:8000",
-  "https://deep-fake-d.vercel.app"
+  "https://deep-fake-d.vercel.app",
+  "https://vertiasapi.vercel.app"
 ];
 app.use(
   cors({
