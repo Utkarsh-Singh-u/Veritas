@@ -24,7 +24,7 @@ Built with **React**, **Node.js**, **MongoDB**, **FastAPI**, **Hugging Face Tran
 
 ## 🔗 Links
 
-- 🌐 Live App: https://deep-fake-d.vercel.app/
+- 🌐 Live App: https://vertiasapi.vercel.app
 - 📦 API: https://deepfake-d90n.onrender.com
 - 🤖 AI Service: https://utkarsh-singh-deepfake.hf.space/api/v1/predict/image
 - 📚 Documentation: https://github.com/Utkarsh-Singh-u/Veritas
