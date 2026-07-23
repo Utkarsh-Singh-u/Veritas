@@ -32,6 +32,7 @@
     "multer": "^2.1.1",
     "nodemailer": "^9.0.1",
     "razorpay": "^2.9.6",
+    "resend": "^6.18.0",
     "stripe": "^22.2.1"
   },
   "devDependencies": {
