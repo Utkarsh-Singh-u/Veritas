@@ -1,6 +1,10 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import dns from 'node:dns';
+
+// Force Node.js to use IPv4 over IPv6 to prevent ENETUNREACH errors on Render
+dns.setDefaultResultOrder('ipv4first');
 
 const app=express();
 
