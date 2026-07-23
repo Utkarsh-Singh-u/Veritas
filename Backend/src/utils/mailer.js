@@ -5,10 +5,12 @@ let transporter = null;
 function getTransporter() {
   if (!transporter) {
     transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: 'smtp.gmail.com', // Use host instead of service: 'gmail'
+      port: 465,
+      secure: true, // true for 465, false for other ports
       auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        pass: process.env.EMAIL_APP_PASSWORD, // Must be an App Password, not your normal password
       },
     });
   }
