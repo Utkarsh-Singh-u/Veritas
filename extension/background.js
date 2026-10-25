@@ -1,4 +1,5 @@
-const BACKEND_URL = "https://deepfake-d90n.onrender.com/api/v1/ai-service/predict";
+// const BACKEND_URL = "https://deepfake-d90n.onrender.com/api/v1/ai-service/predict";
+const BACKEND_URL = "http://127.0.0.1:8000/api/v1/predict/image"
 
 // ─── Normalize verdict ────────────────────────────────────────────────────────
 function normalizeVerdict(verdict) {
@@ -400,16 +401,21 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
       removeScanningBorder(tab.id);
 
-      if (backendResponse.ok && responseData.data) {
+      const dataObj = responseData.data || responseData;
+      const verdict = dataObj?.verdict;
+      const confidence = dataObj?.confidence;
+      const remaining = responseData.scansRemaining ?? dataObj?.scansRemaining;
+
+      if (backendResponse.ok && verdict !== undefined) {
         injectResultCard(tab.id, imageUrl, {
-          type: normalizeVerdict(responseData.data.verdict),
-          confidence: responseData.data.confidence,
-          remaining: responseData.scansRemaining
+          type: normalizeVerdict(verdict),
+          confidence: confidence,
+          remaining: remaining
         });
       } else {
         injectResultCard(tab.id, imageUrl, {
           type: "error",
-          message: responseData.message || "Unknown server error."
+          message: responseData.message || responseData.detail || "Unknown server error."
         });
       }
     } catch (err) {

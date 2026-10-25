@@ -349,6 +349,29 @@ export default function Home() {
                 </div>
                 <span className="hm-verdict-score">{result.confidence}%</span>
               </div>
+              <p className="hm-analysis-note">{result.notice || "This is a model prediction, not proof of authenticity."}</p>
+              {result.image_info && (
+                <div className="hm-analysis-details">
+                  <div className="hm-analysis-heading">Image and provenance signals</div>
+                  <div className="hm-analysis-grid">
+                    <span>Image</span><strong>{result.image_info.format} · {result.image_info.width} × {result.image_info.height}</strong>
+                    <span>EXIF metadata</span><strong>{result.image_info.has_exif ? "Present (can be edited)" : "Not found"}</strong>
+                    {result.image_info.camera_model && <><span>Camera model</span><strong>{result.image_info.camera_model}</strong></>}
+                    {result.image_info.software && <><span>Software tag</span><strong>{result.image_info.software}</strong></>}
+                  </div>
+                  {result.class_scores && <div className="hm-score-breakdown">
+                    {Object.entries(result.class_scores).map(([label, score]) => (
+                      <div className="hm-score-row" key={label}>
+                        <span>{label}</span><div className="hm-score-track"><i style={{ width: `${score}%` }} /></div><strong>{score}%</strong>
+                      </div>
+                    ))}
+                  </div>}
+                  <details className="hm-hash-details">
+                    <summary>Show SHA-256 fingerprint</summary>
+                    <code>{result.image_info.sha256}</code>
+                  </details>
+                </div>
+              )}
             </div>
           )}
         </div>

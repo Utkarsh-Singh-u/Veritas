@@ -6,6 +6,10 @@
 
 **Veritas** is a full-stack AI-powered deepfake detection platform that allows developers, businesses, and end users to verify image authenticity using a modern web application, REST API, and browser extension.
 
+## Scan report and interpretation
+
+Each scan returns the classifier's predicted label and confidence, per-class scores, basic image properties, available EXIF camera/software tags, and a SHA-256 fingerprint of the uploaded bytes. The fingerprint can identify an identical file in a later workflow; it does not establish who created the image or whether its contents are authentic. EXIF data is user-editable and can be removed, so metadata is displayed as context rather than proof. The classifier is a prediction and can make mistakes, especially on content or processing types outside its training data.
+
 Built with **React**, **Node.js**, **MongoDB**, **FastAPI**, **Hugging Face Transformers**, and a **Chrome Extension** for real-time image verification directly from the web.
 
 ---
@@ -487,11 +491,15 @@ cd ai-service
 pip install -r requirements.txt
 ```
 
+These service pins support Python 3.13 as well as the Python 3.10 runtime configured for deployment. PyTorch 2.6.0 is paired with torchvision 0.21.0. Do not install this service requirements file into the TPU training notebook; Colab supplies its own accelerator-specific PyTorch build.
+
 Run:
 
 ```bash
-uvicorn main:app --reload
+uvicorn main:app --host 0.0.0.0 --port 7860 --reload
 ```
+
+The service downloads the fine-tuned private model from Hugging Face at startup. Set `HF_TOKEN` to a read-enabled token with access to the model repository before starting the service. The default model is `Utkarsh-Singh/veritex-vit-openfake`; override it with `HF_MODEL_ID` if needed. Keep the token in your local environment or deployment secrets, never in committed source or `.env` files. `GET /health` reports readiness. The Node backend should set `AI_SERVICE_URL` to `http://localhost:7860/api/v1/predict/image` for local development.
 
 ---
 
@@ -518,6 +526,14 @@ NODE_ENV=development
 
 RAZORPAY_KEY_ID=
 RAZORPAY_KEY_SECRET=
+```
+
+## AI Service
+
+```env
+HF_TOKEN=                 # Read-enabled token for the private Hugging Face model
+HF_MODEL_ID=Utkarsh-Singh/veritex-vit-openfake
+MAX_IMAGE_BYTES=20971520
 ```
 
 ---

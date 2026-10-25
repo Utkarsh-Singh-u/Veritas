@@ -1,0 +1,11 @@
+# Install a CUDA-enabled PyTorch build separately using the selector at
+# https://pytorch.org/get-started/locally/ (Colab already includes PyTorch).
+# Colab TPU runtimes provide a compatible torch_xla build; avoid installing an
+# independently versioned torch_xla wheel into the shared Colab runtime.
+transformers>=4.45,<5
+datasets>=3.0,<5
+huggingface_hub>=0.26,<2
+pillow>=10,<13
+numpy>=1.26,<3
+scikit-learn>=1.5,<2
+tqdm>=4.66,<5

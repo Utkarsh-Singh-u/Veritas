@@ -8,4 +8,4 @@ COPY --chown=user . $HOME/app
 RUN pip install -r requirements.txt
 
 EXPOSE 7860
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-7860}"]

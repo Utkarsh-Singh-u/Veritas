@@ -1,9 +1,9 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.2.2
-torchvision==0.17.2
-numpy<2.0.0
-transformers<4.44.0
-facenet-pytorch
+torch==2.6.0
+torchvision==0.21.0
+numpy>=1.26,<3
+transformers>=4.45,<5
+huggingface_hub>=0.26,<2
 pillow
 fastapi
 uvicorn
